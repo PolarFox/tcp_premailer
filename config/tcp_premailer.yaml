@@ -1,3 +1,5 @@
+host: 127.0.0.1
+port: 8081
 username: foobar
 password: barfoo
 memcached_host: 127.0.0.1

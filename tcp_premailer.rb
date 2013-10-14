@@ -8,20 +8,20 @@ require 'tempfile'
 require 'memcached'
 require 'logger'
 
-
+$config=YAML.load(File.open('config/tcp_premailer.yaml'))
 
 class MailNet < EventMachine::Connection
 	def initialize(*args)
 		@ip = nil
 		@digest = nil
-		@config=YAML.load(File.open('config/tcp_premailer.yaml'))
-		@cache=Memcached.new("#{@config['memcached_host'].to_s}:#{@config['memcached_port'].to_s}")
-		@warn = Logger.new(@config['logfile']+".warn",'monthly')
+
+		@cache=Memcached.new("#{$config['memcached_host'].to_s}:#{$config['memcached_port'].to_s}")
+		@warn = Logger.new($config['logfile']+".warn",'monthly')
 		@warn.level = Logger::WARN	
 		@warn.formatter = proc do |severity, datetime, progname, msg|
 			"[#{severity}] #{datetime} (#{@ip}): #{msg}\n"
 		end
-		@log = Logger.new(@config['logfile']+".log",'monthly')
+		@log = Logger.new($config['logfile']+".log",'monthly')
 		@log.level = Logger::INFO
 		@log.formatter = @warn.formatter
 		super
@@ -29,7 +29,7 @@ class MailNet < EventMachine::Connection
 	
 	def receive_data(data)
 		port, @ip = Socket.unpack_sockaddr_in(get_peername)
-		unless @config['username']==data[/^([^:]+):/,1] and @config['password']==data[/^[^:]+:([^:]+):/,1] and @config['allowed'].include?(@ip)
+		unless $config['username']==data[/^([^:]+):/,1] and $config['password']==data[/^[^:]+:([^:]+):/,1] and $config['allowed'].include?(@ip)
 			@log.fatal "Auth fail"
 			close_connection
 			return false
@@ -72,5 +72,5 @@ class MailNet < EventMachine::Connection
 end
 
 EventMachine.run do 
-	EventMachine.start_server	'127.0.0.1', 8081, MailNet
+	EventMachine.start_server $config['host'], $config['port'], MailNet
 end
