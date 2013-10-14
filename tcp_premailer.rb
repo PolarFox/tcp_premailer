@@ -46,7 +46,7 @@ class MailNet < EventMachine::Connection
 			html.rewind
 			send_data(to_inline_css(html))
 		end
-		send_data "<!-- "+@digest.to_s+" -->\n"
+		send_data "<!-- DIGEST::"+@digest.to_s+"::DIGEST -->\n"
 		close_connection_after_writing
 		@ip=nil
 		@digest=nil
