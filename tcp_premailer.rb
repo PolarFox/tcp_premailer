@@ -8,7 +8,7 @@ require 'tempfile'
 require 'memcached'
 require 'logger'
 
-$config=YAML.load(File.open('config/tcp_premailer.yaml'))
+$config=YAML.load(File.open(File.dirname(__FILE__)+'/config/tcp_premailer.yaml'))
 
 class MailNet < EventMachine::Connection
 	def initialize(*args)
