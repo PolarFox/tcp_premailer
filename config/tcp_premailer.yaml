@@ -5,4 +5,5 @@ password: barfoo
 memcached_host: 127.0.0.1
 memcached_port: 11211
 logfile: /tmp/request # without file extension
+pidfile: /tmp/tcp_premailer.pid
 allowed: [127.0.0.1,192.168.81.81]
