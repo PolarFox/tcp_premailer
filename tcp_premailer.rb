@@ -71,6 +71,67 @@ class MailNet < EventMachine::Connection
 	end
 end
 
-EventMachine.run do 
-	EventMachine.start_server $config['host'], $config['port'], MailNet
+def run
+	EventMachine.run do 
+		EventMachine.start_server $config['host'], $config['port'], MailNet
+	end
+end
+
+def get_pid
+	if File.exists?($config['pidfile'])
+		file = File.new($config['pidfile'], "r")
+		pid = file.read
+		file.close
+ 
+		pid
+	else
+		0
+	end
+end
+
+def start
+	pid = get_pid
+	if pid != 0
+		warn "Daemon is already running"
+		exit -1
+	end
+	 
+	pid = fork {
+		run
+	}
+	begin
+		file = File.new($config['pidfile'], "w")
+		file.write(pid)
+		file.close
+		Process.detach(pid)
+	rescue => exc
+		Process.kill('TERM', pid)
+		warn "Cannot start daemon: #{exc.message}"
+	end
+end
+
+def stop
+	pid = get_pid
+	begin
+		EM.stop
+	rescue
+	end
+	 
+	if pid != 0
+		Process.kill('HUP', pid.to_i)
+		File.delete($config['pidfile'])
+		puts "Stopped"
+	else
+		warn "Daemon is not running"
+		exit -1
+	end
+end
+
+case ARGV[0]
+	when 'start'
+		start
+	when 'stop'
+		stop
+	else
+		exit
 end
