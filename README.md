@@ -3,12 +3,14 @@ tcp_premailer
 
 Premailer mail formatter that runs on EventMachine TCP server.
 
+https://github.com/premailer/premailer
+
 
 #### Sponsored by
 
-[![Email Factory Oy](http://pic.useful.fi/be4a4146ea5986fae6dd78dada6de49b.png)](http://emailfactory.fi) [![Email Factory Oy](http://emailfactory.cc/img/h1_email-factory.png)](http://emailfactory.fi)
+[![Email Factory Oy](http://pic.useful.fi/be4a4146ea5986fae6dd78dada6de49b.png)](http://emailfactory.fi) [![Email Factory Oy](http://emailfactory.fi/images/logo.png)](http://emailfactory.fi)
 
-[![Lygon Software](http://lygon.net/lygonsoftware.png)](http://lygon.net)
+[![Lygon Software](http://lygon.net/lygon-software-logo.png)](http://lygon.net)
 
 ## License
 
