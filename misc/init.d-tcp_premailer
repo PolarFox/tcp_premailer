@@ -27,6 +27,11 @@ DAEMON=/home/polarfox/tcp_premailer/tcp_premailer.rb
 # pid file for the daemon
 PIDFILE=/tmp/tcp_premailer.pid
 
+# Read configuration variable file if it is present
+if [ -f /etc/default/tcp_premailer ] ; then
+        . /etc/default/tcp_premailer
+fi
+
 test -x $DAEMON || exit 5
 
 case $1 in
