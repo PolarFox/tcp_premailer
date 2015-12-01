@@ -132,6 +132,8 @@ case ARGV[0]
 		start
 	when 'stop'
 		stop
+	when 'foreground'
+	    run
 	else
 		exit
 end
