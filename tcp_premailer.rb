@@ -41,15 +41,21 @@ class MailNet < EventMachine::Connection
 			send_data @cache.get(@digest)
 			@log.info "Sent from cache: #{@digest}"
 		rescue Memcached::NotFound
-			html=Tempfile.new('mail') 
-			html.write data[/^[^:]+:[^:]+:(.*)/mi,1]
-			html.rewind
-			send_data(to_inline_css(html))
+			send_data(process_data(data))
+		rescue Memcached::Error
+			send_data(process_data(data))
 		end
 		send_data "<!-- DIGEST::"+@digest.to_s+"::DIGEST -->\n"
 		close_connection_after_writing
 		@ip=nil
 		@digest=nil
+	end
+
+	def process_data(data)
+		html=Tempfile.new('mail')
+		html.write data[/^[^:]+:[^:]+:(.*)/mi,1]
+		html.rewind
+		to_inline_css(html)
 	end
 	
 	def to_inline_css(html)
@@ -63,11 +69,15 @@ class MailNet < EventMachine::Connection
 			html.close
 			html.unlink
 			@log.info "Caching with digest: #{@digest}" unless @digest==nil
-			@cache.set(@digest,icss) unless @digest==nil
-			warns.each{|w| @warn.warn w}
-			@cache.set("warnings-"+@digest,warns)
+			begin
+				@cache.set(@digest,icss) unless @digest==nil
+				warns.each{|w| @warn.warn w}
+				@cache.set("warnings-"+@digest,warns)
+			rescue Memcached::Error
+				@log.warn "Cache could not be written"
+			end
 			@log.info "Cached warnings: warnings-"+@digest if warns.length > 0
-			return icss
+			icss
 	end
 end
 
